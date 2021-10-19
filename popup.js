@@ -1,78 +1,42 @@
-// Initialize button with user's preferred color
 let changeColor = document.getElementById("changeColor");
 
-chrome.storage.sync.get("color", ({ color }) => {
-  changeColor.style.backgroundColor = "#0ff"; //color;
-});
+let startInput = document.getElementById("startTime");
+let endInput = document.getElementById("endTime");
 
-// When the button is clicked, inject setPageBackgroundColor into current page
+const end = new Date();
+const endDate = end.toISOString().substring(0, 10);
+const endTime = end.toISOString().substring(11, 19);
+endInput.value = `${endDate} ${endTime}`;
+
+const start = new Date(end - 60 * 60 * 1000);
+const startDate = start.toISOString().substring(0, 10);
+const startTime = start.toISOString().substring(11, 19);
+startInput.value = `${startDate} ${startTime}`;
+
 changeColor.addEventListener("click", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    function: haha, //setPageBackgroundColor,
+  const startEpoch = Date.parse(startInput.value);
+  const endEpoch = Date.parse(endInput.value);
+
+  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+    let url = tabs[0].url;
+    // url =
+    //   "https://example.com/startTime/1634379579180/endTime/1634465979180/tail";
+
+    const epochRgex = /(.*)startTime\/([0-9]+)\/endTime\/([0-9]+)(.*)/;
+    const match = url.match(epochRgex);
+
+    if (match && match.length >= 5) {
+      const head = match[1];
+      // const epochStart = match[2];
+      // const epochEnd = match[3];
+      const tail = match[4];
+      const newUrl = `${head}startTime/${startEpoch}/endTime/${endEpoch}${tail}`;
+
+      chrome.tabs.update(tab.id, { url: newUrl });
+    } else {
+      alert("unsupported URL \\o/");
+    }
   });
 });
-
-// The body of this function will be executed as a content script inside the
-// current page
-function setPageBackgroundColor() {
-  chrome.storage.sync.get("color", ({ color }) => {
-    document.body.style.backgroundColor = "#0ff"; //color;
-  });
-}
-
-function haha() {
-  // alert(document.location.href);
-  // console.log(document.location.href);
-  const url =
-    "https://example.com/startTime/1634379579180/endTime/1634465979180/tail";
-
-  // const epochRgex = /([0-9]+)×([0-9]+)/;
-  const epochRgex = /(.*)startTime\/([0-9]+)\/endTime\/([0-9]+)(.*)/;
-  const match = url.match(epochRgex);
-  if (match) {
-    const head = match[1];
-    const epochStart = match[2];
-    const epochEnd = match[3];
-    const tail = match[4];
-    const newUrl = `${head}startTime/abc/endTime/123${tail}`;
-    alert(newUrl);
-  }
-
-  // alert(document.location.href);
-
-  // window.location.href = "https://yahoo.com";
-  // chrome.storage.sync.get("color", ({ color }) => {
-  //   document.body.style.backgroundColor = "#0ff"; //color;
-  // });
-}
-
-// document.addEventListener(
-//   "DOMContentLoaded",
-//   function () {
-//     var checkPageButton = document.getElementById("checkPage");
-//     checkPageButton.addEventListener(
-//       "click",
-//       function () {
-//         chrome.tabs.getSelected(null, function (tab) {
-//           d = document;
-
-//           var f = d.createElement("form");
-//           f.action = "http://gtmetrix.com/analyze.html?bm";
-//           f.method = "post";
-//           var i = d.createElement("input");
-//           i.type = "hidden";
-//           i.name = "url";
-//           i.value = tab.url;
-//           f.appendChild(i);
-//           d.body.appendChild(f);
-//           f.submit();
-//         });
-//       },
-//       false
-//     );
-//   },
-//   false
-// );

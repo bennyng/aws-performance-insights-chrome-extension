@@ -1,12 +1,9 @@
 {
-  "name": "Getting Started Example",
-  "description": "Build an Extension!",
+  "name": "Performance Insights Datepicker",
+  "description": "AWS RDS Performance Insights Datepicker",
   "version": "1.0",
   "manifest_version": 3,
-  "background": {
-    "service_worker": "background.js"
-  },
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
