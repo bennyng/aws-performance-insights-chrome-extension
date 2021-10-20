@@ -35,8 +35,20 @@ changeColor.addEventListener("click", async () => {
       const newUrl = `${head}startTime/${startEpoch}/endTime/${endEpoch}${tail}`;
 
       chrome.tabs.update(tab.id, { url: newUrl });
+      // chrome.tabs.reload(tab.id), { bypassCache: true };
+
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: changeLocation,
+        args: [newUrl],
+      });
     } else {
       alert("unsupported URL \\o/");
     }
   });
 });
+
+function changeLocation(newLocation) {
+  window.location.href = newLocation;
+  window.location.reload();
+}
